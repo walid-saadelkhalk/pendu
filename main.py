@@ -14,46 +14,12 @@ menu_theme = pygame_menu.themes.THEME_BLUE.copy()
 
 
 menu = None
-
-def difficulte(value):
+def difficulte(value, difficulty):
     pass
-
-def score():
-    fenetre = pygame.display.set_mode((width, height))
-    fenetre.fill((239, 98, 58))
-    pygame.display.flip()
-
-    # Obtenir le nom du joueur depuis le champ de saisie
-    player_name = menu.get_input_data().get('JOUEUR', '')
-
-    # Sauvegarder le nom du joueur dans le fichier "score.txt"
-    with open('score.txt', 'a') as fichier_score:
-        fichier_score.write(f"Joueur : {player_name}\n")
-
-    # Image de Mario et fond
-    image = pygame.image.load("images/mario.png")
-    fenetre.blit(image, (550, 350))
-
-    # Titre
-    titre_font = pygame.font.Font("police/PressStart2P-Regular.ttf", 50)
-    titre = titre_font.render("SCORE", True, (0, 0, 0))
-    fenetre.blit(titre, (width // 2 - titre.get_width() // 2, 50))
-
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                return
-
-        pygame.display.flip()
-
-
-
 
 def demarrer_jeu():
     hangman()
     pass
-
 
 def inserer_mot():
     insertion()
@@ -117,11 +83,11 @@ def insertion():
 
         pygame.display.flip()
 
-
 status_pendu = 0
 
+
 def hangman():
-    global status_pendu, mot, devine
+    global status_pendu
     fenetre = pygame.display.set_mode((width, height))
     fenetre.fill((239, 98, 58))
     pygame.display.flip()
@@ -165,11 +131,13 @@ def hangman():
     #choix du mot
     with open('mots.txt', 'r') as fichier:
         liste_mots = fichier.readlines()
+
+        
     mots = list(liste_mots)
     mots = [mot.strip().lower() for mot in liste_mots]
     mot = random.choice(mots)
     devine = []
-
+    
 
 
     def dessin():
@@ -203,19 +171,19 @@ def hangman():
                 pygame.draw.circle(fenetre, (0, 0, 0), (x, y), radius, 3)
                 text = lettre_font.render(ltr, 1, (0, 0, 0))
                 fenetre.blit(text, (x - text.get_width()/2, y - text.get_height()/2))
+        
+
+
         fenetre.blit(images[status_pendu], (100, 50))
        
 
-
     #message de victoire/défaite
-  
     def affichage_message(message, mot_perdu="", running=True):
         
         fenetre.fill((239, 98, 58))
         text = mot_font.render(message, 1, (0, 0, 0))
         fenetre.blit(text, (width/2 - text.get_width()/2, height/2 - text.get_height()/2))
-
-                    
+        
         if mot_perdu:
             text_mot_perdu = mot_font.render(f"Le mot était : {mot_perdu}", 1, (0, 0, 0))
             fenetre.blit(text_mot_perdu, (width/2 - text_mot_perdu.get_width()/2, height/2 + 30))
@@ -224,9 +192,9 @@ def hangman():
         pygame.time.delay(3000)
         return False
         
+            
 
-
-    # Actions sur la fenêtrel
+    # Actions sur la fenêtre
 
     def main():
         global status_pendu
@@ -256,7 +224,11 @@ def hangman():
                                 devine.append(lettre_pressee)
                                 if lettre_pressee not in mot:
                                     status_pendu += 1
-
+                                    
+                                   
+                                    
+                    
+ 
             dessin()
             victoire = True
             for lettre in lettres: 
@@ -267,12 +239,10 @@ def hangman():
 
             victoire = all(lettre in devine for lettre in mot)
         
-            
             if victoire:
                 affichage_message("Vous avez gagné!")
-                pygame.time.delay(30)
+                pygame.time.delay(10)
                 break
-                
                 
             if status_pendu == 6:
                 affichage_message("Vous avez perdu!", mot)
@@ -289,16 +259,16 @@ def hangman():
 
 
 # Titre
-menu_theme.title_offset = (290, 40) 
+menu_theme.title_offset = (200, 50) 
 menu_theme.title_font_color = (0, 0, 0)  
-menu_theme.title_font_size = 60 
+menu_theme.title_font_size = 100  
 menu_theme.title_bar_style = pygame_menu.widgets.MENUBAR_STYLE_NONE  
 
 # Boutons
 menu_theme.background_color = background_color  
 menu_theme.title_font = custom_font
 menu_theme.widget_font = custom_font
-menu_theme.widget_font_size = 20 
+menu_theme.widget_font_size = 25 
 menu_theme.widget_font_color = (0, 0, 0) 
 menu_theme.widget_padding = 20  
 menu_theme.selection_color = (255, 255, 255)  
@@ -311,10 +281,10 @@ image_path = "images/mario.png"
 menu.add.image(image_path, scale=(0.5, 0.5), angle=0)
 
 # Ajouter un bouton au menu
+menu.add.text_input('JOUEUR :', default='')
 menu.add.selector('NIVEAU :', [('FACILE', 1), ('MOYEN', 2), ('DIFFICILE', 3)], onchange=difficulte)
-menu.add.button('HANGMAN', demarrer_jeu())
+menu.add.button('HANGMAN', demarrer_jeu)
 menu.add.button('INSERER', inserer_mot)
-menu.add.button('SCORE', score)
 menu.add.button('QUITTER', pygame_menu.events.EXIT)
 
 menu.mainloop(surface)
